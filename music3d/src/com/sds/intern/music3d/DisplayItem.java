@@ -46,7 +46,7 @@ public final class DisplayItem {
     private int mStackId;
     private MediaItemTexture mThumbnailImage = null;
     private Texture mScreennailImage = null;
-    private UriTexture mHiResImage = null;
+   
     private float mConvergenceSpeed = 1.0f;
 
     public final MediaItem mItemRef;
@@ -142,33 +142,17 @@ public final class DisplayItem {
     }
 
     public Texture getScreennailImage(Context context) {
-        Texture texture = mScreennailImage;
-        if (texture == null || texture.mState == Texture.STATE_ERROR) {
-            MediaSet parentMediaSet = mItemRef.mParentMediaSet;
-            if (parentMediaSet != null && parentMediaSet.mDataSource.getThumbnailCache() == LocalDataSource.sThumbnailCache) {
-                if (mItemRef.mId != Shared.INVALID && mItemRef.mId != 0) {
-                    texture = new MediaItemTexture(context, null, mItemRef);
-                } else if (mItemRef.mContentUri != null) {
-                    texture = new UriTexture(mItemRef.mContentUri);
-                }
-            } else {
-                texture = new UriTexture(mItemRef.mScreennailUri);
-                ((UriTexture) texture).setCacheId(Utils.Crc64Long(mItemRef.mFilePath));
-            }
-            mScreennailImage = texture;
-        }
-        return texture;
+		return mScreennailImage;
+       
     }
 
     public void clearScreennailImage() {
-        if (mScreennailImage != null) {
-            mScreennailImage = null;
-            mHiResImage = null;
+      
         }
-    }
+    
 
     public void clearHiResImage() {
-        mHiResImage = null;
+
     }
 
     public void clearThumbnail() {
@@ -339,13 +323,8 @@ public final class DisplayItem {
     }
 
     public final Texture getHiResImage(Context context) {
-        UriTexture texture = mHiResImage;
-        if (texture == null) {
-            texture = new UriTexture(mItemRef.mContentUri);
-            texture.setCacheId(Utils.Crc64Long(mItemRef.mFilePath));
-            mHiResImage = texture;
-        }
-        return texture;
+		return mScreennailImage;
+      
     }
 
     public boolean isAlive() {

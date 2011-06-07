@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class LocalDataSource implements DataSource {
 
 	public static final Object CAMERA_BUCKET_ID = null;
-	public static DiskCache sThumbnailCache;
+	
 
 	public void loadMediaSets(MediaFeed feed) {
 		// TODO Auto-generated method stub
@@ -29,11 +29,6 @@ public class LocalDataSource implements DataSource {
 		return false;
 	}
 
-	public DiskCache getThumbnailCache() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public String[] getDatabaseUris() {
 		// TODO Auto-generated method stub
 		return null;
@@ -43,5 +38,6 @@ public class LocalDataSource implements DataSource {
 		// TODO Auto-generated method stub
 
 	}
+
 
 }

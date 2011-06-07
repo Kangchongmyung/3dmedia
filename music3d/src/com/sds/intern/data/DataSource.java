@@ -30,8 +30,6 @@ public interface DataSource {
     void shutdown();
 
     boolean performOperation(int operation, ArrayList<MediaBucket> mediaBuckets, Object data);
-
-    DiskCache getThumbnailCache();
     
     // This method is called so that we can setup listeners for any databases that the datasource uses
     String[] getDatabaseUris();

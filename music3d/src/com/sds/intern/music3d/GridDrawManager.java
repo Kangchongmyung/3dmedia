@@ -50,7 +50,7 @@ public final class GridDrawManager {
     private final DisplayItem[] mDisplayItems;
     private final DisplaySlot[] mDisplaySlots;
     private final DisplayList mDisplayList;
-    private final GridCamera mCamera;
+    
     private final GridDrawables mDrawables;
     private IndexRange mBufferedVisibleRange;
     private IndexRange mVisibleRange;
@@ -86,7 +86,7 @@ public final class GridDrawManager {
         }
     };
 
-    public GridDrawManager(Context context, GridCamera camera, GridDrawables drawables, DisplayList displayList,
+    public GridDrawManager(Context context, GridDrawables drawables, DisplayList displayList,
             DisplayItem[] displayItems, DisplaySlot[] displaySlots) {
         sThumbnailConfig.thumbnailWidth = 128;
         sThumbnailConfig.thumbnailHeight = 96;
@@ -94,7 +94,7 @@ public final class GridDrawManager {
         mDisplaySlots = displaySlots;
         mDisplayList = displayList;
         mDrawables = drawables;
-        mCamera = camera;
+       
         mItemsDrawn = new DisplayItem[GridLayer.MAX_ITEMS_DRAWABLE];
 
         StringTexture.Config stc = new StringTexture.Config();
@@ -234,14 +234,10 @@ public final class GridDrawManager {
                             }
                         } else {
                             float minVal = -1.0f;
-                            float maxVal = GridCamera.EYE_Z * 0.5f;
+                            
                             float zVal = minVal + mSpreadValue;
-                            zVal = FloatUtils.clamp(zVal, minVal, maxVal);
-                            if (Float.isInfinite(zVal) || Float.isNaN(zVal)) {
-                                mCamera.moveZTo(0);
-                            } else {
-                                mCamera.moveZTo(-zVal);
-                            }
+                            
+                            
                         }
                     }
                 }
@@ -304,11 +300,11 @@ public final class GridDrawManager {
     public void drawFocusItems(RenderView view, GL11 gl, float zoomValue, boolean slideshowMode, float timeElapsedSinceView) {
         int selectedSlotIndex = mSelectedSlot;
         GridDrawables drawables = mDrawables;
-        GridCamera camera = mCamera;
+
         DisplayItem[] displayItems = mDisplayItems;
         int firstBufferedVisibleSlot = mBufferedVisibleRange.begin;
         int lastBufferedVisibleSlot = mBufferedVisibleRange.end;
-        boolean isCameraZAnimating = mCamera.isZAnimating();
+
         for (int i = firstBufferedVisibleSlot; i <= lastBufferedVisibleSlot; ++i) {
             if (selectedSlotIndex != Shared.INVALID && (i >= selectedSlotIndex - 2 && i <= selectedSlotIndex + 2)) {
                 continue;
@@ -319,7 +315,7 @@ public final class GridDrawManager {
             }
         }
         if (selectedSlotIndex != Shared.INVALID) {
-            float camX = camera.mLookAtX * camera.mScale;
+
             int centerIndexInDrawnArray = (selectedSlotIndex - firstBufferedVisibleSlot) * GridLayer.MAX_ITEMS_PER_SLOT;
             if (centerIndexInDrawnArray < 0 || centerIndexInDrawnArray >= displayItems.length) {
                 return;
@@ -334,7 +330,7 @@ public final class GridDrawManager {
                 focusItemTextureLoaded = true;
             }
             float centerTranslateX = centerDisplayItem.mAnimatedPosition.x;
-            final boolean skipPrevious = centerTranslateX < camX;
+
             view.setAlpha(1.0f);
             gl.glEnable(GL11.GL_BLEND);
             gl.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
@@ -342,7 +338,7 @@ public final class GridDrawManager {
             for (int i = -1; i <= 1; ++i) {
                 if (slideshowMode && timeElapsedSinceView > 1.0f && i != 0)
                     continue;
-                float viewAspect = camera.mAspectRatio;
+     
                 int selectedSlotToUse = selectedSlotIndex + i;
                 if (selectedSlotToUse >= 0 && selectedSlotToUse <= lastBufferedVisibleSlot) {
                     int indexInDrawnArray = (selectedSlotToUse - firstBufferedVisibleSlot) * GridLayer.MAX_ITEMS_PER_SLOT;
@@ -353,11 +349,7 @@ public final class GridDrawManager {
                     MediaItem item = displayItem.mItemRef;
                     final Texture thumbnailTexture = displayItem.getThumbnailImage(view.getContext(), sThumbnailConfig);
                     Texture texture = displayItem.getScreennailImage(view.getContext());
-                    if (isCameraZAnimating && (texture == null || !texture.isLoaded())) {
-                        texture = thumbnailTexture;
-                        mSelectedMixRatio.setValue(0f);
-                        mSelectedMixRatio.animateValue(1f, 0.75f, view.getFrameTime());
-                    }
+                  
                     Texture hiRes = (zoomValue != 1.0f && i == 0 && item.getMediaType() != MediaItem.MEDIA_TYPE_VIDEO) ? displayItem
                             .getHiResImage(view.getContext())
                             : null;
@@ -377,29 +369,14 @@ public final class GridDrawManager {
                     }
                     final Texture fsTexture = texture;
                     if (texture == null || !texture.isLoaded()) {
-                        if (Math.abs(centerTranslateX - camX) < 0.1f) {
-                            if (focusItemTextureLoaded && i != 0) {
-                                view.bind(texture);
-                            }
-                            if (i == 0) {
-                                view.bind(texture);
-                                view.prime(texture, true);
-                            }
-                        }
+                       
                         texture = thumbnailTexture;
                         if (i == 0) {
                             mSelectedMixRatio.setValue(0f);
                             mSelectedMixRatio.animateValue(1f, 0.75f, view.getFrameTime());
                         }
                     }
-                    if (mCamera.isAnimating() || slideshowMode) {
-                        if (!slideshowMode && skipPrevious && i == -1) {
-                            continue;
-                        }
-                        if (!skipPrevious && i == 1) {
-                            continue;
-                        }
-                    }
+                    
                     int theta = (int) displayItem.getImageTheta();
                     // If it is in slideshow mode, we draw the previous item in
                     // the next item's position.
@@ -436,10 +413,8 @@ public final class GridDrawManager {
                         float imageWidth = texture.getWidth();
                         float imageHeight = texture.getHeight();
                         boolean portrait = ((theta / 90) % 2 == 1);
-                        if (portrait) {
-                            viewAspect = 1.0f / viewAspect;
-                        }
-                        quad.resizeQuad(viewAspect, u, v, imageWidth, imageHeight);
+                       
+                       
                         quad.bindArrays(gl);
                         drawDisplayItem(view, gl, displayItem, texture, PASS_FOCUS_CONTENT, null, 0.0f);
                         quad.unbindArrays(gl);
@@ -452,7 +427,7 @@ public final class GridDrawManager {
                                 v = texture.getNormalizedHeight();
                                 imageWidth = texture.getWidth();
                                 imageHeight = texture.getHeight();
-                                quad.resizeQuad(viewAspect, u, v, imageWidth, imageHeight);
+                               
                                 quad.bindArrays(gl);
                                 drawDisplayItem(view, gl, displayItem, fsTexture, PASS_FOCUS_CONTENT, null, 1.0f);
                                 quad.unbindArrays(gl);
@@ -633,7 +608,7 @@ public final class GridDrawManager {
 //                                    StringTexture textureString = displaySlot.getLocationImage(reverseGeocoder, stringTextureTable);
                                 	 StringTexture textureString = null;
                                     float textWidth = (textureString != null) ? textureString.computeTextWidth() : 0;
-                                    textWidth *= (mCamera.mOneByScale * 0.5f);
+                                   
                                     if (textWidth == 0.0f) {
                                         textWidth -= 0.18f;
                                     }
@@ -708,10 +683,9 @@ public final class GridDrawManager {
 
     private void drawDisplayItem(RenderView view, GL11 gl, DisplayItem displayItem, Texture texture, int pass,
             Texture previousTexture, float mixRatio) {
-        GridCamera camera = mCamera;
+       
         Vector3f animatedPosition = displayItem.mAnimatedPosition;
-        float translateXf = animatedPosition.x * camera.mOneByScale;
-        float translateYf = animatedPosition.y * camera.mOneByScale;
+      
         float translateZf = -animatedPosition.z;
         int stackId = displayItem.getStackIndex();
         final int maxDisplayedItemsPerSlot = (displayItem.mCurrentSlotIndex == mCurrentScaleSlot && mCurrentScaleSlot != Shared.INVALID) ? GridLayer.MAX_DISPLAYED_ITEMS_PER_FOCUSED_SLOT
@@ -769,7 +743,7 @@ public final class GridDrawManager {
                 }
             }
         }
-        gl.glTranslatef(-translateXf, -translateYf, -translateZf);
+       
         float theta = (pass == PASS_FOCUS_CONTENT) ? displayItem.mAnimatedImageTheta + displayItem.mAnimatedTheta
                 : displayItem.mAnimatedTheta;
         if (theta != 0.0f) {
@@ -787,7 +761,7 @@ public final class GridDrawManager {
         if (theta != 0.0f) {
             gl.glRotatef(-theta, 0.0f, 0.0f, 1.0f);
         }
-        gl.glTranslatef(translateXf, translateYf, translateZf);
+ 
         if (usingMixedTextures) {
             view.unbindMixed();
         }
