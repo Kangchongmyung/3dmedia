@@ -1,0 +1,8 @@
+*.class
+*.classpath
+*.project
+*.apk
+~bin
+~gen
+~settings
+~assets
