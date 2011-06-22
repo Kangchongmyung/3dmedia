@@ -62,7 +62,7 @@ public final class HudLayer extends Layer {
     private final ImageButton mZoomInButton = new ImageButton();
     private final ImageButton mZoomOutButton = new ImageButton();
     private PathBarLayer mPathBar;
- 
+   
     private MenuBar.Menu[] mNormalBottomMenu = null;
     private MenuBar.Menu[] mSingleViewIntentBottomMenu = null;
     private MenuBar.Menu[] mNormalBottomMenuNoShare = null;
@@ -136,7 +136,7 @@ public final class HudLayer extends Layer {
 
     HudLayer(Context context) {
         mAlpha = 1.0f;
-        
+      
         mTopRightButton.setSize((int) (100 * App.PIXEL_DENSITY), (int) (94 * App.PIXEL_DENSITY));
 
         mZoomInButton.setSize(66.666f * App.PIXEL_DENSITY, 42 * App.PIXEL_DENSITY);
@@ -475,7 +475,9 @@ public final class HudLayer extends Layer {
         mPathBar.recomputeComponents();
     }
 
-  
+    public void setFeed(MediaFeed feed, int state, boolean needsLayout) {
+       
+    }
 
     public void onGridStateChanged() {
         updateViews();
@@ -496,7 +498,7 @@ public final class HudLayer extends Layer {
         mZoomOutButton.setHidden(mFullscreenMenu.isHidden());
 
         // Show the time bar in stack and grid states, except in selection mode.
-      
+        
         // mTimeBar.setHidden(selectionMode || (state !=
         // GridLayer.STATE_TIMELINE && state != GridLayer.STATE_GRID_VIEW));
 
@@ -547,7 +549,6 @@ public final class HudLayer extends Layer {
         topRightButton.setAction(action);
     }
 
-  
 
     public PathBarLayer getPathBar() {
         return mPathBar;
@@ -669,7 +670,7 @@ public final class HudLayer extends Layer {
 
     void reset() {
         mLoadingLayer.reset();
-       
+        
     }
 
     public void fullscreenSelectionChanged(MediaItem item, int index, int count) {
@@ -854,9 +855,4 @@ public final class HudLayer extends Layer {
         mZoomInButton.setHidden(hide);
         mZoomOutButton.setHidden(hide);
     }
-
-	public void setFeed(MediaFeed feed, int mState, boolean needsLayout) {
-		// TODO Auto-generated method stub
-		
-	}
 }
